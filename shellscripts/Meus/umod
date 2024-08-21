@@ -1,0 +1,2 @@
+# Tornar script em executável
+sudo chmod +x /usr/local/bin/$1

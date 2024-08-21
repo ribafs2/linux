@@ -1,0 +1,33 @@
+* * * * * env DISPLAY=:0.0 /home/x/Documents/MyScripts/Cron/BeepAlarm "Wake Up"
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7)
+# |  |  |  |  |
+# *  *  *  *  *   command to be executed
+
+MAILTO=user@somehost.tld
+1 2 * * * /path/to/your/command
+
+Provide the full path to your command.
+
+1 2 * * * /path/to/your/command
+
+
+grep -i cron /var/log/syslog|tail -2
+
+sudo crontab -e
+
+0 13 * * * /usr/local/bin/transf.sh
+
+
+SOME_DIR=/var/log
+MY_LOG_FILE=/var/log/some_file.log
+
+BIN_DIR=/usr/local/bin
+MY_EXE=/usr/local/bin/some_executable_file
+
+0 10 * * * ${MY_EXE} some_param >> ${MY_LOG_FILE}

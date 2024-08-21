@@ -1,0 +1,63 @@
+== Backup dos bancos de dados
+
+mysqldump -u [user name] –p [password] [options] [database_name] [tablename] > [dumpfilename.sql]
+
+-u [user_name]: É um nome de usuário para conectar ao servidor MySQL. Para gerar o backup usando mysqldump, ‘Select’ to dump the tables, ‘Show View’ for views, ‘Trigger’ para os triggers. Se você não estiver usando a opção de transação única, os privilégios de "Bloquear tabelas" devem ser concedidos ao usuário
+    -p [password]: A senha válida do usuário MySQL
+    [options]: A opção de configuração para personalizar o backup
+    [database_name]: Nome do banco de dados do qual deseja fazer backup
+    [tablename]: Este é um parâmetro opcional. Se você quiser fazer backup de tabelas específicas, pode especificar os nomes no comando
+    “<” OU ”>”: Este caractere indica se estamos gerando o backup do banco de dados ou restaurando o banco de dados. Você pode usar “>” para gerar o backup e “<” para restaurar o backup
+    [dumpfilename.sql]: Caminho e nome do arquivo de backup. Como mencionei, podemos gerar o backup em XML, texto delimitado ou arquivo SQL para que possamos fornecer a extensão do arquivo de acordo
+    
+Backup de um banco
+
+mysqldump -uroot -p nomebd > /home/ribafs/backup/nomebd.sql    
+
+Backup de dois bancos
+
+mysqldump -uroot -p -databases nomebd1 nomebd2 > /home/ribafs/backup/bd1bd2.sql
+
+Backup de todos os bancos de dados
+
+mysqldump -uroot -p --all-databases > /home/ribafs/backup/todos_22022021.sql
+
+Backup somente da estrutura, sem os dados
+
+mysqldump -uroot -p --no-data banco1 > /home/ribafs/backup/banco1_estrutura_22022021.sql
+
+Backup de duas tabelas
+
+mysqldump -uroot -p banco1 rabela1 tabela2 > /home/ribafs/backup/banco1_tabela1_tabela2.sql
+
+Backup somente dos dados de um banco
+
+mysqldump -uroot -p banco1 --no-create-info > /home/ribafs/backup/banco1_dados.sql
+
+Restore dos bancos
+
+Remova o banco original antes
+
+drop database banco1;
+
+create database banco1;
+
+mysql -uroot -p banco1 < /home/ribafs/backup/banco1.sql
+
+mysql -uroot -p
+
+use banco1;
+
+show tables;
+
+Restaurar uma tabela específica
+
+Remova a tabela original antes;
+
+Restaurar a tabela actor do banco1 do script banco1.sql
+
+mysqldump -uroot -p banco1 actor > /home/ribafs/backup/banco1.sql
+
+Referências
+https://www.sqlshack.com/how-to-backup-and-restore-mysql-databases-using-the-mysqldump-command/
+

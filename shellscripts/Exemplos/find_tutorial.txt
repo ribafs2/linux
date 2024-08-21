@@ -1,0 +1,128 @@
+Procurando Arquivos pelo Terminal do Linux com find e locate
+
+Procurar arquivo no diretório atual:
+find -name "arquivo.zip"
+
+Procurar arquivo ignorando o case:
+find -iname "Arquivo.zip"
+
+Procurar arquivos que não tenham um nome:
+
+find -not -name "nome-a-ignorar"
+
+Procurar arquivo pelo tipo:
+
+find -type tipo_descritor arquivo.txt
+
+tipo_descritor:
+    f: regular file
+    d: directory
+    l: symbolic link
+    c: character devices
+    b: block devices
+
+Procurar todos os arquivos tipo caractere no raiz:
+find / -type c
+
+Procurar todos os arquivos terminados com .conf:
+find / -type f -name "*.conf"
+
+Procurando por tamanho/size:
+
+    c: bytes
+    k: Kilobytes
+    M: Megabytes
+    G: Gigabytes
+    b: 512-byte blocks
+
+find / -size 50c
+
+Procurar todos os arquivos menores que 50 bytes:
+find / -size -50c
+
+Procurar todos os arquivos maiores que 700MB:
+find / -size +700M
+
+Procurar arquivos de acordo com o tempo:
+    Access Time: Last time a file was read or written to. (-atime)
+    Modification Time: Last time the contents of the file were modified.(-mtime)
+    Change Time: Last time the file's inode meta-data was changed.(-ctime)
+
+Procurar arquivos que foram modificados há 1 dia:
+find / -mtime 1
+
+Procurar arquivos que foram acessados há menos de 1 dia:
+find / -atime -1
+
+Procurar arquivos que tiveram suas metainformações mudadas há mais de 3 dias:
+find / -ctime +3
+
+Arquivos que foram modificados há menos de 1 minuto:
+find / -mmin -1
+
+Procurar arquivos que tenham como dono o user syslog:
+find / -user syslog
+
+Procurar arquivos do grupo shadown:
+find / -group shadow
+
+Procurar arquivos com permissão 777:
+find . -type f -perm 0777 -print
+
+Procurar arquivos com permissão diferente de 777:
+find / -type f ! -perm 777
+
+Procurar todos os arquivos executáveis:
+find / -perm /a=x
+
+Procurar todos os arquivos com permissão 777 e mudar para 644:
+find / -type f -perm 0777 -print -exec chmod 644 {} \;
+
+Procurar diretórios com permissão 777 e mudar para 755:
+find / -type d -perm 777 -print -exec chmod 755 {} \;
+
+Procurar o arquivo tecmint.txt e removê-lo:
+find . -type f -name "tecmint.txt" -exec rm -f {} \;
+
+Procurar todos os arquivos .mp3 e removê-los:
+find . -type f -name "*.mp3" -exec rm -f {} \;
+
+Procurar todos os arquivos vazios:
+find /tmp -type f -empty
+
+Procurar todos os diretórios vazios:
+find /tmp -type d -empty
+
+Procurar todos os arquivos ocultos:
+find /tmp -type f -name ".*"
+
+Procurar todos os arquivos do usuário ribafs no diretório /home/ribafs:
+find /home/ribafs -user ribafs
+
+Procurar arquivos que tenham permissão igual a 666:
+find / -perm 666
+
+Procurar arquivos que tenham permissão igual a 777:
+find / -perm 777
+
+Contar os arquivos com certo nome no diretório atual:
+find -name file1 | wc -l
+
+Mudar as permissões do diretório /var/www/html recursivamente para 755 e de todos os arquivos para 644:
+find /var/www/html -type d -exec chmod 755 {} \;
+find /var/www/html -type f -exec chmod 644 {} \;
+
+
+Procurando com locate
+
+sudo apt-get update
+sudo apt-get install mlocate
+
+sudo updatedb
+
+locate nomearquivo
+
+Referências:
+https://www.digitalocean.com/community/tutorials/how-to-use-find-and-locate-to-search-for-files-on-a-linux-vps
+https://www.tecmint.com/35-practical-examples-of-linux-find-command/
+

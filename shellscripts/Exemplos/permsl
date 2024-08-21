@@ -1,0 +1,8 @@
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do ,/$1";
+echo "";
+find ./$1 -type d -exec chmod 775 {} \;
+find ./$1 -type f -exec chmod 664 {} \;
+echo "";
+echo "Concluído!";

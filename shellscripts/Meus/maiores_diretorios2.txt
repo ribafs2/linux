@@ -1,0 +1,6 @@
+Listar maiores arquivos de diretório
+
+du --human-readable * | sort --human-numeric-sort
+
+
+du -h | egrep -v "\./.+/" | sort -h

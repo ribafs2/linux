@@ -1,0 +1,276 @@
+grep: como buscar strings em arquivos no Linux
+
+O comando grep é utilizado para buscar strings e padrões (usando Expressões Regulares) dentro de arquivos. O nome do comando significa global regular expression print, ou seja, ele imprime trechos de arquivos que correspondam a uma determinada expressão regular.
+
+Você pode usar apenas strings para realizar as buscas. Porém, o uso de Expressões Regulares abre um grande leque de opções para buscas avançadas. Se você não conhece Expressões Regulares, sugiro que leia Expressões Regulares – Guia de Consulta Rápida, de Aurelio Marinho Jargas, disponível gratuitamente na Internet pelo próprio autor.
+
+Nota: Este artigo é um a versão reduzida do artigo bônus do curso Shell Script Para Programadores. Para conhecer melhor o curso e fazer sua matrícula, clique aqui.
+
+A sintaxe do comando grep é a seguinte:
+
+$ grep [opcoes] arquivo
+
+O comando grep funciona da seguinte forma: ele lê um arquivo linha a linha. Se a linha lida corresponder ao padrão (Expressão Regular) usada na filtragem, a linha é exibida na saída padrão. O comportamento da exibição pode ser modificado com as opções que veremos adiante, como exibir apenas o nome do arquivo, incluir número de linha, exibir só o texto que coincidiu com o padrão etc.
+
+Em vez de abordar a fundo a parte teórica, vou ficar em exemplos práticos. Antes disso, precisamos ver as principais opções do comendo grep.
+Principais Opções do Comando grep
+
+Existem inúmeras opções que podem ser utilizadas com o comando grep. Vou falar apenas das mais comuns e principais. As opções mais usadas são:
+
+    -A NUM, --after-context=NUM: exibe NUM linhas após a linha onde o padrão foi encontrado;
+    -B NUM, --before-context=NUM: exibe NUM linhas antes da linha onde o padrão foi encontrado;
+    -C NUM, -NUM, --context=NUM exibe NUM linhas antes e NUM linhas depois da linha onde o padrão foi encontrado;
+    -c, --count: conta o total de linhas que coincidiram com o padrão;
+    --color, --colour: ativa a exibição de cores, destacando o trecho que coincide com o padrão;
+    -E, --extended-regexp: Interpreta as Expressões Regulares usando o modo POSIX (equivale a usar o comando egrep em vez do grep;
+    -i, --ignore-case: Modo case-insensitive. Não diferencia maiúsculas de minúsculas;
+    -l, --files-with-matches: em vez de exibir a saída normal, exibe apenas os nomes dos arquivos que coincidem com o padrão;
+    -n, --line-number: exibe o número da linha onde o padrão foi encontrado;
+    -o, --only-matching: exibe apenas o trecho da linha que coincide com o padrão;
+    -R, -r, --recursive: realiza busca recursiva;
+    -x, --line-regexp: filtra por linhas que coincidam exatamente com o padrão;
+    -v, --invert-match: Inverte o modo de assimilação. A busca é feita por linhas que não coincidam com o padrão;
+
+Se você está habituado(a) a usar o padrão POSIX de Expressões Regulares (com os quantificadores +, {NUM} etc), é preferível usar o comando egrep em vez do grep. Isso poupa você de ter que usar a opção -E sempre que for usar esse padrão de Expressão Regular.
+Arquivo Para os Exemplos
+
+Para ilustrar os exemplos, será útil utilizar um arquivo de texto. Usarei um arquivo de dicionário, que possui milhares de palavras e nomes da Língua Portuguesa. Esse arquivo pode ser baixado aqui (está compactado em ZIP).
+Exemplos de Uso
+
+Como eu citei antes, se você estiver habituado(a) a usar Expressões Regulares (ERs) do padrão POSIX, será melhor usar egrep em vez de grep. Como eu sou uma dessas pessoas, vou usar egrep em todos os exemplos, mesmo quando não utilizar expressões regulares. É uma simples questão de hábito pessoal. :)
+Filtrando linhas por uma string
+
+$ egrep 'programador' wordlist-preao-20150102.txt
+desprogramador
+desprogramadora
+desprogramadoras
+desprogramadores
+programador
+programadora
+programadoras
+programadores
+reprogramador
+reprogramadora
+reprogramadoras
+reprogramadores
+
+O comando exibe todas as linhas que contenham a palavra “programador”.
+Contando as ocorrências de um padrão
+
+Para exibir o total de ocorrências de um padrão em vez da saída padrão do grep, usamos a opção -c:
+
+$ egrep -c 'programador' wordlist-preao-20150102.txt
+12
+
+Filtrando por linha exata
+
+Se quisermos apenas a linha onde há a palavra “programador”, exatamente, usamos a opção -x:
+
+$ egrep -x 'programador' wordlist-preao-20150102.txt
+programador
+
+Se quisermos buscar por “programador” ou “programadora”, basta utilizarmos o básico sobre ERs:
+
+$ egrep -x 'programadora?' wordlist-preao-20150102.txt
+programador
+programadora
+
+Exibindo o número da linha
+
+Para exibir o número da linha, usamos a opção -n:
+
+$ egrep -xn 'programadora?' wordlist-preao-20150102.txt
+776176:programador
+776177:programadora
+
+Filtragem case-insensitive
+
+Para fazer filtragem case-insensitive (ignorando diferenças entre maiúsuclas e minúsculas), usamos a opção -i:
+
+$ egrep -i 'marcel' wordlist-preao-20150102.txt
+Marcelino
+Marcelismo
+Marcelismos
+Marcelista
+Marcelistas
+Marcelo
+
+Buscamos por “marcel”, mas os resultados se iniciam por letras maiúsculas. Se retirarmos a opção -i, nenhum resultado será exibido.
+Filtrando por linhas que não coincidem com o padrão
+
+Para filtrar por linhas que NÃO coincidem com o padrão, usamos a opção -v:
+
+$ egrep -v 'programador' wordlist-preao-20150102.txt
+
+Esse comando exibe todas as linhas que não coincidam com o padrão “programador”. Não incluí a saída do comando, pois possui milhares de linhas.
+Exibindo linhas anteriores a um padrão
+
+Além de exibir apenas a linha que coincide com o padrão do filtro, podemos exibir as linhas imediatamente anteriores à linha que coincidiu com o padrão. Para isso, usamos a opção -B NUM (B de before), onde NUM é o número de linhas que devem ser exibidor.
+
+$ egrep -nx -B 2 'programador' wordlist-preao-20150102.txt
+776174-programadas
+776175-programado
+776176:programador
+
+Nesse comando, filtro pela linha que contém exatamente a palavra “programador” (opção -x), exibindo, também, os números de linha (opção -n). Com a opção -B 2, são exibidas as duas linhas anteriores à linha onde há a palavra “programador”.
+Exibindo linhas posteriores a um padrão
+
+De forma semelhante ao que ocorre com a opção -B NUM, é possível exibir as linhas posteriores. Usa-se a opção -A NUM (A de after).
+
+$ egrep -nx -A 2 'programador' wordlist-preao-20150102.txt
+776176:programador
+776177-programadora
+776178-programadoras
+
+Exibindo linhas anteriores e posteriores a um padrão
+
+Podemos mostrar as linhas anteriores e posteriores, se juntarmos as opções -A e -B. Porém, há uma forma mais simples, usando a opção -C, desta forma:
+
+$ egrep -nx -C 2 'programador' wordlist-preao-20150102.txt
+776174-programadas
+776175-programado
+776176:programador
+776177-programadora
+776178-programadoras
+
+Isso equivale a usar as opções -A e -B juntas, desta forma:
+
+$ egrep -nx -A 2 -B 2 'programador' wordlist-preao-20150102.txt
+776174-programadas
+776175-programado
+776176:programador
+776177-programadora
+776178-programadoras
+
+Colorindo o trecho que coincide com o padrão
+
+Usando a opção --color (ou --colour, no inglês britânico) é possível destacar os trechos que coincidiram com o padrão. Por exemplo:
+
+$ egrep --color 'programador' wordlist-preao-20150102.txt
+desprogramador
+desprogramadora
+desprogramadoras
+desprogramadores
+programador
+programadora
+programadoras
+programadores
+reprogramador
+reprogramadora
+reprogramadoras
+reprogramadores
+
+Você verá que todas as ocorrências de “programador” nessas strings estarão destacadas (em vermelho, provavelmente).
+Busca recursiva
+
+Para exemplificar a busca recursiva, vou duplicar o arquivo de dicionário, criando os arquivos wordlist-preao-20150102_2.txt e wordlist-preao-20150102_3.txt. Vou deixá-los no mesmo diretório. Mas, como a busca será recursiva, eles poderiam estar em qualquer nível abaixo do diretório corrente.
+
+Para realizar buscas recursivas, usarmos a opção -r ou -R. Desta vez, não vamos informar um nome de arquivo. Em vez disso, passaremos o nome di um diretório. No exemplo abaixo, uso o diretório corrente (.).
+
+$ egrep -rx 'programador' .
+./wordlist-preao-20150102.txt:programador
+./wordlist-preao-20150102_2.txt:programador
+./wordlist-preao-20150102_3.txt:programador
+
+Quando a busca é recursiva, antes da linha é sempre exibido o nome do arquivo onde o padrão foi encontrado.
+Exibindo apenas o nome do arquivo onde o padrão foi encontrado
+
+Com a busca recursiva, às vezes apenas queremos saber em qual arquivo existe um determinado padrão, sem exibir as linhas. Para isso, basta usar a opção -l, desta forma:
+
+$ egrep -rl 'programador' .
+./wordlist-preao-20150102.txt
+./wordlist-preao-20150102_2.txt
+./wordlist-preao-20150102_3.txt
+
+Conclusão
+
+A ferramenta grep é bem completa, permitindo fazer buscar bem complexas, usando Expressões Regulares.
+
+É possível juntar várias opções (dentre as que mostrei e diversas outras do grep) e realizar buscas de forma rápida e ágil.
+Dica para Programadores
+
+Uma combinação de parâmetros que acho muito útil no dia-a-dia de programação é a -irn. Muitas vezes preciso procurar onde alguma string está presente e em quais arquivos. Por isso faço uma busca recursiva, case-insensitive, mostrando o número da linha onde o padrão foi encontrado. Por exemplo:
+
+$ egrep -irn 'string' .
+
+Para aprender mais sobre Comandos Linux e Shell Script, veja meu curso Shell Script Para Programadores.
+
+Roberto Beraldo
+Graduado em Ciência da Computação, pela Universidade Federal do Paraná (UFPR), é desenvolvedor de software desde 2008, com foco em Desenvolvimento Web com PHP.
+
+-----------------
+
+O comando grep
+
+O grep pode ser visto como uma forma simplificada de consulta a um banco de dados em texto puro, em que cada linha representa um registro.
+O utilitário pode ser usado para retirar um conjunto de strings (cadeias de caracteres) do resultado de um comando dado ou de um arquivo texto, por mais longo que seja.
+Este artigo reúne uma coletânea de exemplos, que irão ajudar a entender bem o funcionamento do grep.
+Use a caixa de busca para descobrir outros artigos que fazem uso de exemplos com o comando grep.
+Exemplo básico de uso do comando grep
+
+Para pedir uma lista dos processos em execução na máquina, podemos usar o comando ‘ps aux’.
+Mas a lista pode ser muito extensa e você só quer saber (por exemplo) do ‘NetworkManager’:
+
+
+ps aux | grep -i net
+
+Observe que ele exibe e destaca todas as strings contendo a cadeia de caracteres “net” (veja a imagem, abaixo).
+Entenda o que foi feito:
+
+
+    O comando ps aux exibe todos os processos em execução.
+    O operador | redireciona os resultados do comando ps para o grep, que filtra as ocorrências de “net” do resultado.
+    O parâmetro -i, pede ao programa que ignore se as letras estão em maiúsculas/minúsculas.
+
+Use o grep para filtrar resultados de arquivos de log do sistema
+
+Certos arquivos de log do sistema são muito extensos e podem conter uma quantidade imensurável de informações irrelevantes pra sua situação.
+O grep pode ajudar a encontrar “uma agulha no palheiro”.
+Vejamos, como exemplo o arquivo de log /var/log/dmesg que contém informações atuais do que está ocorrendo no seu sistema.
+Vamos visualizar seu conteúdo – deixando de fora tudo o que não se refere à nossa interface de rede eth0:
+
+
+cat /var/log/dmesg | grep eth0
+
+Captura de tela de 2013-02-22 14:09:19
+Use o egrep para filtrar resultados com operadores lógicos
+
+Outros comandos, como lshw, também retornam uma lista muito extensa e podem demorar muito para finalizar.
+O interessante, aqui, é direcionar o resultado do comando para um arquivo texto, que será usado com muito mais facilidade.
+Com o seguinte comando, você cria o arquivo lshw.log contendo o resultado do lshw:
+
+
+sudo lshw > lshw.log
+
+Este procedimento traz as vantagens de não precisar mais invocar o sudo, para obter o resultado do lshw e a velocidade com que o sistema lê e exibe o texto do lshw.log.
+A seguir vamos usar uma versão diferente do grep, o egrep, para filtrar os resultados que se referem às nossas interfaces de rede eth0 e wlan0:
+
+
+egrep -C 2 -i '(eth|wlan)0' lshw.log
+
+Olha a explicação do comando acima:
+
+    -C 2 — inclui as 2 linhas acima e as 2 linhas abaixo daquela em que foi encontrada a string desejada.
+    Assim você sabe em que contexto o resultado está inserido.
+    -i — desativa a sensibilidade às ‘caixas’, ou seja, tanto faz se os caracteres estiverem em minúsculas ou maiúsculas.
+    o operador lógico | ou pipe — Desde que a string termine com ‘0’, tanto faz que seja ‘eth0’ ou ‘wlan0’.
+    Assim, ficam incluídos os resultados referentes à interface de rede a cabo e sem fio.
+Como encontrar arquivos com o comando grep
+
+Você pode usar o utilitário também para encontrar arquivos de texto pelo seu conteúdo.
+Para pesquisar recursivamente no diretório atual por arquivos que contenham a palavra “firefox”, use-o da seguinte forma:
+
+
+grep -iR 'firefox' *.conf
+
+Conclusão
+
+Como dicas finais, ao fazer a pesquisa dentro de arquivos grandes, gosto de usar os parâmetros ‘-n’ e ‘--color‘.
+O primeiro numera as linhas, tornando mais fácil, ao abrir o arquivo, encontrar algo que eu desejo alterar.
+O segundo mostra a saída do comando em cores, o que também ajuda a discernir melhor os resultados.
+Você pode obter mais informações sobre o comando ao executar o seu manual:
+
+
+man grep
+
+Divirta-se!

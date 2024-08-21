@@ -1,0 +1,393 @@
+CRONTAB – o agendador de tarefas do linux
+4 de janeiro de 2012 By Ubuntu Dicas 15 Comentários
+
+por Rodolfo Silveira
+
+Olá pessoal, estou aqui de volta fazendo um pequeno tutorial sobre o crontab o agendador de tarefas do Linux, lembrando que o crontab existe em qualquer versão do linux.
+
+Com o crontab é possivel especificar horários como “todos os dias ás 5 da manhã” ou “a cada meia hora”, “de dez em dez minutos”.
+
+Para a maioria das tarefas pouco importa a hora que vai ocorrer mas sim a frequência em que ela vai ser executada, como diariamente ou semanalmente. Para isso já existe 4 diretórios especiais, que basta o administrador botar o script lá dentro, eles já serão executados na periodicidade desejada.
+
+/etc/cron.daily diário
+/etc/cron.hourly a cada hora
+/etc/cron.monthly mensal
+/etc/cron.weekly semanal
+
+Mas caso você mesmo queira fazer um periodo especifico, com hora e tudo mais, basta editar o arquivo:
+/etc/crontab
+
+Então vamos lá. Escolha um editor de sua escolha, no meu caso o VIM e abra um terminal e digite:
+
+sudo vim /etc/crontab
+
+Notem no conteúdo:
+
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# m h dom mon dow user command
+17 * * * * root cd / && run-parts --report /etc/cron.hourly
+25 6 * * * root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6 * * 7 root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6 1 * * root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+#
+
+Notem que já existe algumas entradas justamente dos diretórios especiais, para adicionar sua própria tarefa temos que seguir o seguinte padrão de linha:
+
+minuto hora diadomês mês diadasemana usuário comando
+
+Notem que para cada espaço, se avança um campo e os campos seguem o padrão existente que conhecemos, por exemplo no campo mês não pode ter 15 pois temos de 1-12 e o campo da semana usamos de 0 a 7 onde zero e 7 é domingo 1 é segunda-feira, 2 terça-feira e assim por diante.
+
+Temos também alguns caracteres que facilitam a vida:
+Caractere 	Exemplo 	Siginificado
+Hífen 	2-4 	intervalo de 2 a 4
+virgula 	2,4,6,8 	os números 2,4,6 e 8
+barra 	*/10 	de dez em dez
+asterisco 	* 	todas as opções possiveis
+Vamos botar a mão na massa:
+
+Imagine que temos uma rotina de backup que comprime o o /home e o /var/log e queremos que esta rotina aconteça diariamente as 23:35;
+
+Se usarmos o tar por exemplo, poderíamos usar duas linhas de comando ou não, por isso recomendo que crie um script e no arquivo do CRON nós vamos apontar para o script.
+Criando o script:
+
+
+    vim /scriptbkp.sh
+
+O conteúdo do script, onde comprime a pasta home e a pasta log no hd externo de modo que o nome do arquivo fique com a data do dia da execução e ainda criando um arquivo de log localizado no /scriptbkplog.log para posterior análise:
+
+
+    #!/bin/sh
+    tar -cvzf /media/hdexterno/bkphome$(date +%Y_%m_%d).tar.gz /home >> /scriptbkplog.log
+    tar -cvzf /media/hdexterno/bkplog$(date +%Y_%m_%d).tar.gz /var/log >> /scriptbkplog.log
+
+Salve e saia.
+
+Vamos dar permissão de execução também:
+
+
+    sudo chmod 755 /scriptbkp.sh
+
+Agora vamos lá no crontab:
+
+
+    sudo vim /etc/crontab
+
+Adicione a seguinte linha:
+
+
+    35 23 * * * root sh /scriptbkp.sh
+
+Salve e saia. Pronto, todos os dias da semana, todos os meses, todos os dias do mês, na hora 23 e minuto 35 ele vai executar o script e enviar o backup para o hd externo do exemplo.
+
+Mas e se quisermos a atividade de segunda e sabado as 09:27. A linha ficará assim:
+
+
+    27 09 * * 1,6 root sh /scriptbkp.sh
+
+Se quisermos toda hora, de 08 as 18 de segunda a sexta:
+
+
+    00 8-18 * * 1-5 root sh /scriptbkp.sh
+
+Se quisermos fazer mensalmente independente da hora, feche o crontab e mova o arquivo para a pasta especial, com o seguinte comando:
+
+
+    sudo mv /scriptbkp.sh /etc/cron.monthly
+
+FIM! Se tiverem dúvida podem entrar em contato valeu!
+
+Rodolfo Silveira
+@rodolfo_tec
+e-mail: ro_dolfo14@hotmail.com
+
+Crédito
+https://www.ubuntudicas.com.br/2012/01/crontab-o-agendador-de-tarefas-do-linux/
+
+
+Agendando tarefas em Linux/Unix usando o cron
+Autor: Ricardo Souza Silveira <rikrdosilveira at gmail.com>
+Data: 27/03/2008
+
+Cron - Resumo e introdução
+
+
+Resumo: Este artigo trás informações sobre o comando cron. Alguns comandos e parâmetros que poderão ser utilizados também estarão citados neste artigo, assim como alguns exemplos de como poderá ser utilizado.
+
+Abstract: This article back information on the command cron. Some command and parameters that could be used also will be cited in this article as well as some examples of how it may be used.
+
+Introdução
+O cron é uma ferramenta de sistemas Linux e Unix que permite a execução de comandos ou programas, agendados para um determinado dia/mês/ano/hora.
+
+Para demonstrar melhor a utilidade de comando cron no Linux, suponhamos que por questões de segurança você precisa fazer um backup de alguns arquivos de uma aplicação, que é acessada por clientes diariamente. Neste caso você poderá utilizar o cron para fazer esse backup automaticamente em horários programados.
+
+Como utilizar o cron
+O agendamento das tarefas é feita através do arquivo de configuração localizado no diretório /etc/crontab ou em arquivos de usuários localizados em /var/spool/cron/crontabs/[nome do usuário].
+
+Para adicionar uma tarefa ao cron é preciso que você abra com um editor de texto qualquer (se estiver usando interface gráfica Gnome, e se tiver instalado, poderá utilizar o gedit, ou se e estiver em moda caracter o vim ,vim, nano, pipe como preferir) o arquivo /etc/crontab e agendar, definindo o mês/dia/hora em que o comando devera ser executado. Para que a ferramenta cron funcione não é necessário reiniciá-la.
+
+Para que o agendamento funcione é necessário que siga um padrão, um formato ao qual deve se respeitar. Veja o exemplo abaixo:
+
+[minutos] [horas] [dias do mês] [mês] [dias da semana] [usuário] [comando]
+
+
+31  18   1 *  *  root run-parts --report /etc/cron.montly
+|    |   | |  |    |    |
+|    |   | |  |    |     \_Comando que será executado
+|    |   | |  |    |
+|    |   | |  |     \_ UID que executará o comando
+|    |   | |  |
+|    |   | |  \_ Dia da semana (0-7)
+|    |   | |
+|    |   |  \_ Mês (1-12)
+|    |   |
+|    |    \_ Dia do Mês (1-31)
+|    |
+|     \_ Hora (0-23)
+|
+\_ Minuto (0-59)
+
+Onde corresponde:
+
+Exemplo:
+
+Executar todos os dias, as 0 horas, 0 minutos, todo dia da semana como root o comando backup
+0 0 * * * root /usr/local/bin/backup --report 
+
+
+Outras considerações
+Na opção que corresponde ao dia da semana pode ser utilizado as 3 primeiras letras em inglês (SUN,MON,TUE,WED,THU,FRI,SAT).
+
+Você pode executar tarefas de hora em hora, diariamente, semanalmente e mensalmente, simplesmente colocando seus arquivos dento dos diretório respectivos /etc/cron.hourly, /etc/cron.daily, /etc/cron.weekly e /cron.monthly.
+
+Veja um exemplo: dentro de "/etc/cron.daily/" tenho um arquivo backup, onde tenho o script de backup do meu sistema, ou seja, no meu caso ele ira fazer backup todos os dias as 12:20. Obs.: é necessário que esse arquivo tenha permissão para execução, e para isso basta executar o comando: "chmod +x /etc/cron.daily/backup".
+
+Os campos que não for se importar, pode ser colocado um "*", como se tivesse selecionado "todas as possibilidades", sendo que podem ser colocado "-" (hífen) para determinar os intervalos de execução. A "," (vírgula) define uma lista valores, lista de opções com os números (1,3,5).
+
+O arquivo que é gerado pelo cron em no diretório do usuário '/var/spool/cron/crontabs/[usuário]' pelo crontab tem o mesmo formato do /etc/crontab, exceto por não possuir o campo 'usuário (UID)', pois o nome do arquivo já identifica o usuário no sistema.
+
+Caso você queira editar um arquivo de usuário feito pelo cron, basta utilizar o comando "crontab -e", ele irá abrir o que foi agendado para aquele usuário.
+
+Cuidado, caso você edite o "crontab", certifique-se para que haja uma linha em branco no final do arquivo, caso esta linha não exista o ultimo comando não se executará. E tenha multa atenção ao colocar qualquer texto após o programa que será executado será considerado comentário e não será interpretado pelo cron.
+
+
+Alguns exemplos de comandos
+
+
+Para rodar todo dia de hora em hora:
+
+00 * * * * script
+
+Para rodar de dez em dez minutos todos os dias:
+
+00-59/10 * * * * script
+
+Note a divisão por 5 do intervalo 00-59.
+
+Para rodar uma seqüência de horas:
+
+20 10,12,16,18,22 * * * script
+
+Para rodar numa seqüência de dias do mês às 14:00:
+
+00 14 03-15 * * script
+
+Para rodar ao meio-dia e a meia-noite de terça a sábado:
+
+00 00, 12 * * 2-6 script
+
+Para enviar um e-mail as 20:20 no dia 23/03 para Pedro dizendo "Viva o Linux porque nós amamos a liberdade!":
+
+20 20 23 3 * root echo "Viva o Linux porque nós amamos a liberdade!"|mail Pedro
+
+Conclusão
+Com a utilização da ferramenta cron, concluí que no agendamento de tarefas em sistemas Linux/Unix pode ser feito perfeitamente com o comando cron, sendo um ferramenta fácil de implementar. É ótima para fazer backup automáticos, agendamento de tarefas diárias economizando tempo e trabalho repetitivos.
+
+Referências
+1. Agendando tarefas e rotinas com o Cron:
+http://www.guiadohardware.net/dicas/agendando-tarefas-rotinas-cron.html
+Acessado pela última vez no dia 05/03/2008 às 14:00 horas
+
+2. Usando cron e crontab para agendar tarefas
+http://www.infowester.com/linuxcron.php
+Acessado pela última vez no dia 05/03/2008 às 14:30 horas
+
+3. Utilizando o crontab
+http://www.devin.com.br/eitch/crontab/
+Acessado pela última vez no dia 05/03/2008 às 15:30 horas
+
+4. Crontab
+http://pt.wikipedia.org/wiki/Crontab
+Acessado pela última vez no dia 05/03/2008 às 15:45 horas 
+
+https://www.vivaolinux.com.br/artigos/impressora.php?codigo=7965
+
+==============
+* * * * * env DISPLAY=:0.0 /home/x/Documents/MyScripts/Cron/BeepAlarm "Wake Up"
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7)
+# |  |  |  |  |
+# *  *  *  *  *   command to be executed
+
+* * * * * command to be executed
+- - - - -
+| | | | |
+| | | | ----- Day of week (0 - 7) (Sunday=0 or 7)
+| | | ------- Month (1 - 12)
+| | --------- Day of month (1 - 31)
+| ----------- Hour (0 - 23)
+------------- Minute (0 - 59)
+
+# Minute  Hour  Day of Month      Month         Day of Week    User Command    
+# (0-59) (0-23)   (1-31)    (1-12 or Jan-Dec) (0-6 or Sun-Sat)  
+
+    0       2       *             *                *          root /usr/bin/find
+
+MAILTO=user@somehost.tld
+1 2 * * * /path/to/your/command
+
+Provide the full path to your command.
+
+1 2 * * * /path/to/your/command
+
+Testar se está rodando
+pgrep cron
+Deve aparecer o número do PID
+
+grep CRON /var/log/syslog
+
+grep -i cron /var/log/syslog|tail -2
+
+sudo crontab -e
+
+0 13 * * * /usr/local/bin/transf.sh
+
+
+SOME_DIR=/var/log
+MY_LOG_FILE=/var/log/some_file.log
+
+BIN_DIR=/usr/local/bin
+MY_EXE=/usr/local/bin/some_executable_file
+
+0 10 * * * ${MY_EXE} some_param >> ${MY_LOG_FILE}
+
+
+crontab -u username -e (to edit) -l(to list) -r(to remove) 10(minutes) 8-15(hours) *(Day of month) *(month) 1,3,5(days of week) /path/to/script/script_name.sh
+
+
+* 14 * * * home/hacks/notify.sh >/dev/null 2>&1
+
+
+service cron start /stop /restart
+
+
+https://askubuntu.com/questions/23009/why-crontab-scripts-are-not-working
+
+CHECKLIST
+
+Here's a checklist guide to debug not running cronjobs:
+
+    Is the Cron daemon running?
+        Run ps ax | grep cron and look for cron.
+        Debian: service cron start or service cron restart
+    Is cron working?
+        * * * * * /bin/echo "cron works" >> /file
+        Syntax correct? See below.
+    Is the command working standalone?
+        Check if the script has an error, by doing a dry run on the CLI
+        when testing your command, test as the user whose crontab you are editing, which might not be your login or root
+    Can cron run your job?
+        Check /var/log/cron.log or /var/log/messages for errors.
+        Ubuntu: grep CRON /var/log/syslog
+        Redhat: /var/log/cron
+    Check permissions
+        set executable flag on the command: chmod +x /var/www/app/cron/do-stuff.php
+        if you redirect the output of your command to a file, verify you have permission to write to that file/directory
+    Check paths
+        check she-bangs / hashbangs line
+        do not rely on environment variables like PATH, as their value will likely not be the same under cron as under an interactive session
+    Don't Suppress Output, while debugging
+        commonly used is this suppression: 30 1 * * * command > /dev/null 2>&1
+        re-enable the standard output or standard error message output
+
+Still not working? Yikes!
+
+    Raise the cron debug level
+        Debian
+            in /etc/default/cron
+            set EXTRA_OPTS="-L 2"
+            service cron restart
+            tail -f /var/log/syslog to see the scripts executed
+        Ubuntu
+            in /etc/rsyslog.d/50-default.conf
+            add or comment out line cron.crit /var/log/cron.log
+            reload logger sudo /etc/init.d/rsyslog reload
+            re-run cron
+            open /var/log/cron.log and look for detailed error output
+        Reminder: deactivate log level, when you are done with debugging
+    Run cron and check log files again
+
+Cronjob Syntax
+
+# Minute  Hour  Day of Month      Month         Day of Week    User Command    
+# (0-59) (0-23)   (1-31)    (1-12 or Jan-Dec) (0-6 or Sun-Sat)  
+
+    0       2       *             *                *          root /usr/bin/find
+
+Crontab Commands
+
+    crontab -l
+        Lists all the user's cron tasks.
+    crontab -e, for a specific user: crontab -e -u agentsmith
+        Starts edit session of your crontab file.
+        When you exit the editor, the modified crontab is installed automatically.
+    crontab -r
+        Removes your crontab entry from the cron spooler, but not from crontab file.
+
+===========
+
+* * * * * env DISPLAY=:0.0 /home/x/Documents/MyScripts/Cron/BeepAlarm "Wake Up"
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7)
+# |  |  |  |  |
+# *  *  *  *  *   command to be executed
+
+MAILTO=user@somehost.tld
+1 2 * * * /path/to/your/command
+
+Provide the full path to your command.
+
+1 2 * * * /path/to/your/command
+
+
+grep -i cron /var/log/syslog|tail -2
+
+sudo crontab -e
+
+0 13 * * * /usr/local/bin/transf.sh
+
+
+SOME_DIR=/var/log
+MY_LOG_FILE=/var/log/some_file.log
+
+BIN_DIR=/usr/local/bin
+MY_EXE=/usr/local/bin/some_executable_file
+
+0 10 * * * ${MY_EXE} some_param >> ${MY_LOG_FILE}

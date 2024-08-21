@@ -1,0 +1,64 @@
+#!/bin/bash
+MENU=/usr/local/bin/rede;
+clear
+_Menu ()
+{
+        $CLEAR;
+        echo " "
+        echo "        ============================================================"
+        echo "                DNOCS - ADMINISTRAÇÃO DE SERVIDORES LINUX           "
+        echo "                                                    "
+        echo "        ============== CADASTRAR COMPUTADOR NA REDE ================"
+        echo "                                                    "
+        echo "           1. Cadastrar Computador no dhcpd.conf    "
+        echo "                                                    "
+        echo "           2. Liberar IP de usuário          "
+        echo "                                                    "
+        echo "           0. Sair              "
+        echo "                                                    "
+        echo "        ============================================================"
+        echo "                                                    "
+        echo -n "            Digite um número e tecle ENTER: ======> "
+        read option;
+
+        case "$option" in
+                1)
+                        _adddhcpd;
+                ;;
+		2)
+			_addsuper;
+                ;;
+		0)	
+			_sair;
+		;;
+                *)
+                        $CLEAR;
+                        echo -e "Escolha inválida. Tente novamente.\n Pressione ENTER para continuar.";
+                        read junk;
+                        $MENU
+                ;;
+                esac
+}
+
+_adddhcpd ()
+{
+        $CLEAR;
+        sudo nano /etc/dhcp3/dhcpd.conf;
+	sudo /etc/init.d/dhcp3-server restart
+	$MENU;
+}
+
+_addsuper ()
+{
+        $CLEAR;
+	sudo nano /etc/squid/acl/liberados;
+	sudo /etc/init.d/squid reload;
+	$MENU;
+}
+
+_sair ()
+{
+	clear;
+	exit;
+}
+_Menu;

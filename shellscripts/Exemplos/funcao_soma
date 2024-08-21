@@ -1,0 +1,11 @@
+#!/bin/bash
+# gloabal x and y
+#x=200
+#y=100
+
+soma(){
+  echo $(( $1 + $2 ))
+}
+
+echo "A soma de $1 com $2 é:"
+soma $1 $2

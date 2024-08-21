@@ -1,0 +1,12 @@
+CTRL+R - digite algo - traz último comando executado que tenha o termo (não somente hoje)
+
+history - lista últimos comandos executados
+history | grep algo
+
+CTRL+L - limpa tela
+
+Copiar e colar no terminal:
+
+Selecionar em qualquer programa ou mesmo na tela do terminal e teclar SHIFT+Insert
+
+

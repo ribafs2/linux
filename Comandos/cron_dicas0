@@ -1,0 +1,125 @@
+* * * * * env DISPLAY=:0.0 /home/x/Documents/MyScripts/Cron/BeepAlarm "Wake Up"
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7)
+# |  |  |  |  |
+# *  *  *  *  *   command to be executed
+
+* * * * * command to be executed
+- - - - -
+| | | | |
+| | | | ----- Day of week (0 - 7) (Sunday=0 or 7)
+| | | ------- Month (1 - 12)
+| | --------- Day of month (1 - 31)
+| ----------- Hour (0 - 23)
+------------- Minute (0 - 59)
+
+# Minute  Hour  Day of Month      Month         Day of Week    User Command    
+# (0-59) (0-23)   (1-31)    (1-12 or Jan-Dec) (0-6 or Sun-Sat)  
+
+    0       2       *             *                *          root /usr/bin/find
+
+MAILTO=user@somehost.tld
+1 2 * * * /path/to/your/command
+
+Provide the full path to your command.
+
+1 2 * * * /path/to/your/command
+
+Testar se está rodando
+pgrep cron
+Deve aparecer o número do PID
+
+grep CRON /var/log/syslog
+
+grep -i cron /var/log/syslog|tail -2
+
+sudo crontab -e
+
+0 13 * * * /usr/local/bin/transf.sh
+
+
+SOME_DIR=/var/log
+MY_LOG_FILE=/var/log/some_file.log
+
+BIN_DIR=/usr/local/bin
+MY_EXE=/usr/local/bin/some_executable_file
+
+0 10 * * * ${MY_EXE} some_param >> ${MY_LOG_FILE}
+
+
+crontab -u username -e (to edit) -l(to list) -r(to remove) 10(minutes) 8-15(hours) *(Day of month) *(month) 1,3,5(days of week) /path/to/script/script_name.sh
+
+
+* 14 * * * home/hacks/notify.sh >/dev/null 2>&1
+
+
+service cron start /stop /restart
+
+
+https://askubuntu.com/questions/23009/why-crontab-scripts-are-not-working
+
+CHECKLIST
+
+Here's a checklist guide to debug not running cronjobs:
+
+    Is the Cron daemon running?
+        Run ps ax | grep cron and look for cron.
+        Debian: service cron start or service cron restart
+    Is cron working?
+        * * * * * /bin/echo "cron works" >> /file
+        Syntax correct? See below.
+    Is the command working standalone?
+        Check if the script has an error, by doing a dry run on the CLI
+        when testing your command, test as the user whose crontab you are editing, which might not be your login or root
+    Can cron run your job?
+        Check /var/log/cron.log or /var/log/messages for errors.
+        Ubuntu: grep CRON /var/log/syslog
+        Redhat: /var/log/cron
+    Check permissions
+        set executable flag on the command: chmod +x /var/www/app/cron/do-stuff.php
+        if you redirect the output of your command to a file, verify you have permission to write to that file/directory
+    Check paths
+        check she-bangs / hashbangs line
+        do not rely on environment variables like PATH, as their value will likely not be the same under cron as under an interactive session
+    Don't Suppress Output, while debugging
+        commonly used is this suppression: 30 1 * * * command > /dev/null 2>&1
+        re-enable the standard output or standard error message output
+
+Still not working? Yikes!
+
+    Raise the cron debug level
+        Debian
+            in /etc/default/cron
+            set EXTRA_OPTS="-L 2"
+            service cron restart
+            tail -f /var/log/syslog to see the scripts executed
+        Ubuntu
+            in /etc/rsyslog.d/50-default.conf
+            add or comment out line cron.crit /var/log/cron.log
+            reload logger sudo /etc/init.d/rsyslog reload
+            re-run cron
+            open /var/log/cron.log and look for detailed error output
+        Reminder: deactivate log level, when you are done with debugging
+    Run cron and check log files again
+
+Cronjob Syntax
+
+# Minute  Hour  Day of Month      Month         Day of Week    User Command    
+# (0-59) (0-23)   (1-31)    (1-12 or Jan-Dec) (0-6 or Sun-Sat)  
+
+    0       2       *             *                *          root /usr/bin/find
+
+Crontab Commands
+
+    crontab -l
+        Lists all the user's cron tasks.
+    crontab -e, for a specific user: crontab -e -u agentsmith
+        Starts edit session of your crontab file.
+        When you exit the editor, the modified crontab is installed automatically.
+    crontab -r
+        Removes your crontab entry from the cron spooler, but not from crontab file.

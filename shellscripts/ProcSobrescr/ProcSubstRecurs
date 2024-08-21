@@ -1,0 +1,8 @@
+Procurar e sobrescrever uma string recursivamente
+
+Substituir Contato por Meu Contato em todas as ocorrências
+find ./ -type f -exec sed -i 's/Contato/Meu Contato/g' '{}' \;
+
+Remover todas as ocorrências da string Contato recursivamente na pasta atual
+find ./ -type f -exec sed -i 's/Contato//g' '{}' \;
+

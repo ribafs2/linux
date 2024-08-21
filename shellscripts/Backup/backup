@@ -1,0 +1,16 @@
+cd /backup/usb/pessoais/diario
+nano diario.sh
+chmod +x  diario.sh
+
+#!/bin/bash
+zip -rq /backup/usb/pessoais/diario/diario_$(date +"%Y_%m_%d").zip /backup/usb/www/diario
+mysqldump -uroot diario diarios > /backup/usb/pessoais/diario/diario_$(date +"%Y_%m_%d").sql
+
+crontab -e
+Adicionar ao final:
+0 2 * * * /backup/usb/pessoais/diario/diario.sh
+
+Testar com a cada minuto
+* * * * * /backup/usb/pessoais/diario/diario.sh
+
+Este backup torna desnecessário o pacote iseed

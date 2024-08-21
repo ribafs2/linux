@@ -1,0 +1,3 @@
+# Passe com a porta que deseja testar se está aebrta
+# porta 80
+sudo ss -ltnp | grep $1

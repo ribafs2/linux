@@ -1,0 +1,25 @@
+DATA=$(date +%F)      #Carimbo de data aaaa-mm-dd
+
+DATA=$(date +%d-%m-%Y) # dd-dd-aaaa
+
+DATA=$(date +%d/%m/%Y) # dd/dd/aaaa
+
+echo $DATA
+
+
+hostname -f (retorna nome do user)
+
+sleep - pausa em segundos horas com h
+
+btop - visualizar processos
+
+Script para instalara o AMP/EMP
+
+Timeshift
+
+Snapshot no servidor/Contabo
+
+Algo no google drive
+
+Backup incremental com rsync num disco usb externo
+

@@ -1,0 +1,46 @@
+Dica sobre a linguagem C:
+
+Precisei criar uma máquina virtual com o Windows dentro do VirtualBox no Linux para minha esposa usar o MS Office.
+
+Então para facilitar seu acesso criei um script shell que abre a máquina virtual e o coloquei na área de trabalho.
+
+Acontece que ao clicar no script abre-se uma janela com 4 opções. Eu gostaria de que ao clicar já abrisse o VirtualBox com a VM.
+
+Lembrei de criar um executável que chamasse o script e então fui pesquisar em como fazer isso na lnguagem C.
+
+Criei o script shell
+
+nano win7.sh
+
+vboxmanage startvm Windows7
+
+chmod +x win7.sh
+
+
+Criar o fonte em C:
+
+nano windows7.c
+
+#include <stdio.h>
+#include <stdlib.h>
+int main(int argc, char const *argv[])
+{
+    puts("Executar o seguinte script :");
+    puts("/home/ribafs/win7.sh");
+    puts("Iniciando agora...");
+    system("/home/ribafs/win7.sh");    //it will run the script inside the c code. 
+    return 0;
+}
+
+Compilando
+g++ windows7.c -o windows7
+
+Executando:
+
+./windows7
+
+Ou com um clique na área de trabalho.
+
+Beleza. Assim ele já abre com um único clique sem abrir janela de confirmação.
+Obs.: abre com um único clique porque configurei o nemo para abrir com clique único.
+
